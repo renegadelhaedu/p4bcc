@@ -1,0 +1,27 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Minha primeira página</title>
+    <link rel="stylesheet"
+          href="{{url_for('static', filename='style.css')}}">
+</head>
+<body>
+    <div class="maior">
+        <h1>Meu nome é Yan</h1>
+        <h2>Vou ser papai!!!</h2>
+        <hr>
+        <h3>Chá revelação de mãe</h3>
+        <br>
+    </div>
+    <div>
+        <form action="/qual" method="post">
+            <a>Qual namorada de Yan será mãe?</a>
+            <br>
+            <input type="text" name="namorada" id="namorada">
+            <button type="submit">Enviar</button>
+        </form>
+    </div>
+
+</body>
+</html>
