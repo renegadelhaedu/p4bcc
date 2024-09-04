@@ -6,7 +6,7 @@ app.secret_key = 'testedechave'
 
 @app.route('/')
 def home():
-    return render_template('index.html')
+    return render_template('index2.html')
 
 @app.route('/fazer_login', methods=['POST'])
 def fazer_login():
@@ -18,7 +18,7 @@ def fazer_login():
         return render_template('home.html', user=login)
     else:
         msg = 'Login ou senha incorretos'
-        return render_template('index.html', texto=msg)
+        return render_template('index2.html', texto=msg)
 
 
 @app.route('/exibirPagComentario')
