@@ -2,11 +2,19 @@ from flask import *
 import dao
 
 app = Flask(__name__)
-app.secret_key = 'testedechave'
+app.secret_key = 'xcsdKJAH_Sd56$!'
 
 @app.route('/')
 def home():
+
     return render_template('index2.html')
+
+@app.route('/logout')
+def logout():
+    #dicionário em python (pop=> remove do dict)
+    session.pop('login_user', None)
+
+    return make_response(render_template('index2.html'))
 
 @app.route('/fazer_login', methods=['POST'])
 def fazer_login():
@@ -15,11 +23,19 @@ def fazer_login():
 
     if dao.verificarlogin(login, senha, dao.conectardb()):
         session['login_user'] = login
-        return render_template('home.html', user=login)
+        return render_template('home2.html', user=login)
     else:
         msg = 'Login ou senha incorretos'
         return render_template('index2.html', texto=msg)
 
+@app.route('/exibirpagCadastro')
+def exibirPagCadastro():
+    if 'login_user' in session:
+
+        return render_template('cadastrarprod.html', user=session['login_user'])
+    else:
+
+        return render_template('index2.html', msg='Login necessário')
 
 @app.route('/exibirPagComentario')
 def exibirPagComent():
