@@ -1,14 +1,16 @@
 import psycopg2
+from psycopg2.extras import RealDictCursor
+
 def conectardb():
     con = psycopg2.connect(
-        host='dpg-crl0ao3qf0us73cmdlu0-a.oregon-postgres.render.com',
-        database='p4bcc',
-        user='p4bcc_user',
-        password='UZxYdHDJHcpAgxjp7hTtP033nhbqGWxo'
-        #host='localhost',
+        #host='dpg-crl0ao3qf0us73cmdlu0-a.oregon-postgres.render.com',
         #database='p4bcc',
-        #user='postgres',
-        #password='12345'
+        #user='p4bcc_user',
+        #password='UZxYdHDJHcpAgxjp7hTtP033nhbqGWxo'
+        host='localhost',
+        database='p4bcc',
+        user='postgres',
+        password='12345'
     )
     return con
 
@@ -41,3 +43,46 @@ def insert_comentario(login, comentario, conexao):
 
     conexao.close()
     return exito
+
+def inserirusuario(login, senha):
+    conexao = conectardb()
+    cur = conexao.cursor()
+    exito = False
+    try:
+        sql = f"INSERT INTO usuario (login, senha) VALUES ('{login}', '{senha}')"
+        cur.execute(sql)
+    except psycopg2.IntegrityError:
+        conexao.rollback()
+        exito = False
+    else:
+        conexao.commit()
+        exito = True
+
+    conexao.close()
+    return exito
+
+def listarpessoas(opcao):
+    conexao = conectardb()
+    if opcao == 0:
+        cur = conexao.cursor()
+    else:
+        cur = conexao.cursor(cursor_factory=RealDictCursor)
+    cur.execute(f"SELECT * FROM usuario")
+    recset = cur.fetchall()
+    conexao.close()
+
+    return recset
+
+def buscar_pessoa(login):
+    conexao = conectardb()
+    cur = conexao.cursor()
+    cur.execute(f"SELECT * FROM usuario where login= '{login}' ")
+    recset = cur.fetchall()
+    conexao.close()
+
+    return recset
+
+
+#inserirusuario("jose","123")
+print(listarpessoas(0))
+#print(buscar_pessoa("rene"))

@@ -10,7 +10,7 @@
     <div class="container">
         <div class="header">
             <h1>Sistema WEB</h1>
-            <button class="user-button">{{user}}</button>
+            <button class="user-button" id="atualizarData">Atualizar: {{user}}</button>
             <button class="logout-button" onclick="window.location.href='/logout'">Sair</button>
 
         </div>
@@ -20,9 +20,14 @@
             <button class="menu-button">Buscar</button>
             <button class="menu-button">Listar</button>
             <button class="menu-button">Remover</button>
-            <button class="menu-button">Atualizar</button>
+
+            <form action="/atualizardados" method="post">
+                <button type="submit" class="menu-button">Atualizar</button>
+            </form>
+            <p id="saidaTexto"></p>
         </div>
     </div>
     <script src="{{url_for('static', filename='js/script_botao.js')}}"></script>
+    <script src="../static/js/scriptReq.js"></script>
 </body>
 </html>
