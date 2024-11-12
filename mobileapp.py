@@ -5,9 +5,9 @@ from kivy.uix.button import Button
 from kivy.network.urlrequest import UrlRequest
 from kivy.uix.label import Label
 from kivy.core.window import Window
-import json
 from kivy.utils import get_color_from_hex
 from kivy.uix.scrollview import ScrollView
+import json
 
 class MainApp(App):
     global token
