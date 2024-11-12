@@ -19,6 +19,8 @@ def verificarlogin(nome, senha, conexao):
     cur = conexao.cursor()
     cur.execute(f"SELECT count(*) FROM usuario WHERE login = '{nome}' AND senha = '{senha}'")
     recset = cur.fetchall()
+
+    cur.close()
     conexao.close()
 
     if recset[0][0] == 1:
@@ -41,6 +43,7 @@ def insert_comentario(login, comentario, conexao):
         conexao.commit()
         exito = True
 
+    cur.close()
     conexao.close()
     return exito
 
@@ -73,6 +76,7 @@ def listarpessoas(opcao):
 
     return recset
 
+
 def buscar_pessoa(login):
     conexao = conectardb()
     cur = conexao.cursor()
@@ -84,5 +88,6 @@ def buscar_pessoa(login):
 
 
 #inserirusuario("jose","123")
-print(listarpessoas(0))
+#print(listarpessoas(1))
+#insert_comentario('rene','mengoooo',conectardb())
 #print(buscar_pessoa("rene"))

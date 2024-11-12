@@ -3,9 +3,14 @@ import dao
 import atualizar as atual
 import dataanalise
 import os
+from flask_jwt_extended import JWTManager, create_access_token, jwt_required, get_jwt_identity
+from datetime import timedelta
 
 app = Flask(__name__)
-app.secret_key = 'xcsdKJAH_Sd56$!'
+app.secret_key = 'xcsdKJAH_Sd56$'
+app.config["JWT_SECRET_KEY"] = 'xcsdKJAH_Sd56$'
+app.config["JWT_ACCESS_TOKEN_EXPIRES"] = timedelta(seconds=20)
+jwt = JWTManager(app)
 
 UPLOAD_FOLDER = os.path.join(os.path.dirname(__file__), 'uploads')
 arquivo_csv = 'vendas_grande.csv'
@@ -27,8 +32,7 @@ def fazer_login():
     login = request.form.get('login')
     senha = request.form.get('senha')
 
-    #if dao.verificarlogin(login, senha, dao.conectardb()):
-    if True:
+    if dao.verificarlogin(login, senha, dao.conectardb()):
         session['login_user'] = login
         return render_template('home2.html', user=login)
     else:
@@ -86,20 +90,8 @@ def inserirmsgdatabase():
 
 #API rest
 
-@app.route('/listar', methods=['GET'])
-def get_todos():
-    return jsonify(dao.listarpessoas(1)), 200
-
-
-@app.route('/obter/<string:login>', methods=['GET'])
-def get_usuario(login):
-    user = dao.buscar_pessoa(login)
-    if len(user) == 0:
-        abort(404, description="Tarefa não encontrada")
-    return jsonify(user), 200
-
 @app.route('/inserir', methods=['POST'])
-def create_todo():
+def inserir_usuario():
 
     if not request.json:
         abort(400, description="Dados inválidos")
@@ -112,5 +104,83 @@ def create_todo():
     else:
         abort(400, description="Usuário com login já cadastrado ")
 
+@app.route('/listar', methods=['GET'])
+def get_todos():
+    return jsonify(dao.listarpessoas(1)), 200
+
+#aqui eu usei uma forma possível mas não recomendada: mandei user e senha via post usando o HTTP (pode ser interceptado)
+@app.route('/listarusuarios/externo', methods=['POST'])
+def get_todos_externo():
+    if not request.json:
+        abort(400, description="Dados inválidos")#enviar um objeto response informando erro
+
+    login = request.json["login"]
+    senha = request.json["senha"]
+    print(login)
+    if dao.verificarlogin(login, senha, dao.conectardb()):
+        return jsonify(dao.listarpessoas(1)), 200
+    else:
+        return abort(401,'Usuário ou senha inválidos')
+
+
+@app.route('/obter/<string:login>', methods=['GET'])
+def get_usuario(login):
+    user = dao.buscar_pessoa(login)
+    if len(user) == 0:
+        abort(404, description="Tarefa não encontrada")
+    return jsonify(user), 200
+
+
+#---------- autenticaçao com jwt------------------------
+
+@app.route('/login/externo', methods=['POST'])
+def login_externo():
+    login = request.json['login']
+    senha = request.json['senha']
+    print(login)
+
+    if dao.verificarlogin(login, senha, dao.conectardb()):
+        token = create_access_token(identity=login)
+        return jsonify(access_token=token), 200
+    else:
+        abort(401, description="Usuário ou senha inválidos")
+        #ou
+        #return jsonify({"message": "Usuário ou senha inválidos"}), 401
+
+
+@app.route('/protegido/obter/<string:login>', methods=['GET'])
+@jwt_required()
+def get_usuario_protegido(login):
+    usuario_logado = get_jwt_identity()
+    print(usuario_logado)
+    user = dao.buscar_pessoa(login)
+    if len(user) == 0:
+        abort(404, description="usuário não encontrado")
+    return jsonify(user), 200
+
+
+@app.route('/protegido/listarusuarios/externo', methods=['GET'])
+@jwt_required()
+def listar_usuarios_externo():
+    usuario_logado = get_jwt_identity()
+    print(usuario_logado)
+    return jsonify(dao.listarpessoas(1)), 200
+
+
+
+
 if __name__ == '__main__':
     app.run(debug=True)
+
+    #certificado = os.path.join('ssl', 'certificado.pem')
+    #chave = os.path.join('ssl', 'chave.pem')
+    #app.run(ssl_context=(certificado, chave), debug=True )
+
+
+'''
+instalei 
+como estamos usando um certificado SSL autoassinado, o chrome e os outros navegadores 
+não consideram certificados autoassinados confiáveis (nossa gambiarra local).
+ Lembrem que eles não foram emitidos por uma autoridade certificadora reconhecida (usamos o openssl).
+ se quise usar um, procure o Let's Encrypt (gratuito).
+'''
