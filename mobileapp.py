@@ -24,6 +24,7 @@ class MainApp(App):
     def pegar_token(self, request, response):
         global token
         token = response['access_token']
+        print(token)
         self.list_layout.clear_widgets()
         self.list_layout.add_widget(
             Label(text=f"\n\nLogado", font_size=28, color=get_color_from_hex('#FFFFFF')))
@@ -86,7 +87,7 @@ class MainApp(App):
 
         bota_listar = Button(text="Listar Usuários", size_hint=(0.3, 0.1), size=(50, 50),
                                 pos_hint={'center_x': 0.5, 'center_y': 0.5})
-        bota_listar.bind(on_press=self.send_request2)#associar um método para um botao
+        bota_listar.bind(on_press=self.send_request)#associar um método para um botao
 
         self.list_layout = BoxLayout(orientation='vertical', size_hint_y=None, spacing=30)
         self.list_layout.bind(minimum_height=self.list_layout.setter('height'))

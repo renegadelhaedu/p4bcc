@@ -8,12 +8,44 @@ from datetime import timedelta
 
 app = Flask(__name__)
 app.secret_key = 'xcsdKJAH_Sd56$'
+
+#blueprints
+from rotas.usuarios import  usuarios_bp
+from rotas.produtos import  produtos_bp
+
+app.register_blueprint(usuarios_bp, url_prefix="/usuariosx")
+app.register_blueprint(produtos_bp, url_prefix="/produtosx")
+
 app.config["JWT_SECRET_KEY"] = 'xcsdKJAH_Sd56$'
 app.config["JWT_ACCESS_TOKEN_EXPIRES"] = timedelta(seconds=20)
 jwt = JWTManager(app)
 
+
 UPLOAD_FOLDER = os.path.join(os.path.dirname(__file__), 'uploads')
+app.config['UPLOAD_FOLDER'] = UPLOAD_FOLDER
+
 arquivo_csv = 'vendas_grande.csv'
+
+
+@app.route('/upload', methods=['GET','POST'])
+def uploadArquivo():
+
+    if request.method == 'GET':
+        return render_template('uploadarquivo.html')
+
+    if 'file' not in request.files:
+        return 'nao mandou nenhum arquivo'
+
+    file = request.files['file']
+
+    if file.filename == '':
+        return 'sem nome de arquivo ou nenhum arquivo foi selecionado p envio'
+
+    if file:
+        nomeArquivo = file.filename
+        file.save(os.path.join(app.config['UPLOAD_FOLDER'], nomeArquivo))
+        return f'deu certo: arquivo {nomeArquivo} salvo com sucesso', 200
+
 
 @app.route('/')
 def home():
@@ -165,7 +197,6 @@ def listar_usuarios_externo():
     usuario_logado = get_jwt_identity()
     print(usuario_logado)
     return jsonify(dao.listarpessoas(1)), 200
-
 
 
 
