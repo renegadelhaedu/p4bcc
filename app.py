@@ -99,6 +99,16 @@ def exibirPagCadastro():
 
         return render_template('index2.html', msg='Login necessário')
 
+
+@app.route('/listarexemplos')
+def listar_usuarios():
+    lista_usuarios = dao.listar_users()
+
+    if len(lista_usuarios) > 0:
+        return render_template('listarusuarios.html', users=lista_usuarios)
+    else:
+        return render_template('index.html')
+
 @app.route('/listarprodutos')
 def listar_prods():
     if 'login_user' in session:
@@ -169,7 +179,6 @@ def get_usuario(login):
 def login_externo():
     login = request.json['login']
     senha = request.json['senha']
-    print(login)
 
     if dao.verificarlogin(login, senha, dao.conectardb()):
         token = create_access_token(identity=login)

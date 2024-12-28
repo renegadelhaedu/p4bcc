@@ -76,6 +76,15 @@ def listarpessoas(opcao):
 
     return recset
 
+def listar_users():
+    conexao = conectardb()
+    cur = conexao.cursor()
+
+    cur.execute(f"SELECT login, senha FROM usuario")
+    recset = cur.fetchall()
+    conexao.close()
+
+    return recset
 
 def buscar_pessoa(login):
     conexao = conectardb()
